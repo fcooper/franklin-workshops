@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="js/jquery.min.js"></script>
+
+<style>
+.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+@keyframes fontbulger {
+  0%, 100% {
+    font-size: 60px;
+  }
+  50% {
+    font-size: 90px;
+  }
+}
+
+#action {
+   animation: fontbulger 2s infinite;
+}
+
+</style>
+
+<script language="JavaScript">
+var option = "none";
+var count = 0;
+var expected_val = -1;
+var myVar = false;
+var push_audio;
+var block_audio;
+var twist_audio;
+var ajaxcheck;
+var ajaxSpeed = 300;
+var playerResponseTimeout = 3000;
+
+Number.isInteger = Number.isInteger || function(value) {
+    return typeof value === "number" && 
+           isFinite(value) && 
+           Math.floor(value) === value;
+};
+
+function ajaxCall(ignore) {
+    $.ajax({url: "http://192.168.7.2:12788/", success: function(result){
+        if (ignore == true)
+            return;
+
+        if(result == "ADC") {
+            clearTimeout(ajaxcheck);
+            game("action",-1,2);
+        }
+        if(result == "GPIO") {
+            clearTimeout(ajaxcheck);
+            game("action",-1,0);
+        }
+        if(result == "BLOCK") {
+            clearTimeout(ajaxcheck);
+            game("action",-1,1);
+        }
+        if(result == "Nothing") {
+            ajaxcheck = setTimeout(function() {ajaxCall(false);}, ajaxSpeed);
+        }   
+    }});
+}
+
+$(document).ready(function() {
+    push_audio = document.createElement('audio');
+    push_audio.setAttribute('src', 'audio/push.mp3');
+    push_audio.setAttribute('preload', 'auto');
+
+    block_audio = document.createElement('audio');
+    block_audio.setAttribute('src', 'audio/block.mp3');
+    block_audio.setAttribute('preload', 'auto');
+
+    twist_audio = document.createElement('audio');
+    twist_audio.setAttribute('src', 'audio/twist.mp3'); 
+    twist_audio.setAttribute('preload', 'auto');  
+
+    woosh_audio = document.createElement('audio');
+    woosh_audio.setAttribute('src', 'audio/woosh.mp3');
+    woosh_audio.setAttribute('preload', 'auto');
+
+    crack_audio = document.createElement('audio');
+    crack_audio.setAttribute('src', 'audio/crack.mp3');
+    crack_audio.setAttribute('preload', 'auto');
+
+    button_audio = document.createElement('audio');
+    button_audio.setAttribute('src', 'audio/button.mp3'); 
+    button_audio.setAttribute('preload', 'auto'); 
+
+    background_audio = document.createElement('audio');
+    background_audio.setAttribute('src', 'audio/background.mp3'); 
+    background_audio.setAttribute('preload', 'auto'); 
+    background_audio.setAttribute('loop', 'loop'); 
+
+    gameover_audio = document.createElement('audio');
+    gameover_audio.setAttribute('src', 'audio/gameover.mp3'); 
+    gameover_audio.setAttribute('preload', 'auto');   
+    $( "#playing" ).hide();
+    $( "#menu" ).show();
+
+    $( "#start" ).click(function() {game( "start",-1,3000);});
+    $( "#push" ) .click(function() {game("action",-1,0);});
+    $( "#block" ).click(function() {game("action",-1,1);});
+    $( "#twist" ).click(function() {game("action",-1,2);});
+});
+
+function timeout1() { 
+    game("fail",-1,-1);
+
+}
+
+function stopAllCommand() {
+    push_audio.pause();
+    push_audio.currentTime = 0;
+
+    block_audio.pause();
+    block_audio.currentTime = 0;
+
+    twist_audio.pause();
+    twist_audio.currentTime = 0;        
+}
+function game(state,timeout,val) {
+
+    if(myVar != false) {
+        clearInterval(myVar);
+        myVar = false;
+    }
+
+    if(state == "start" || state == "correct")
+    {
+
+        if(state == "start") {
+            ajaxCall(true);
+            ajaxCall(true);
+            count = 0 ;
+            $( "#menu" ).hide();
+
+            $( "#playing" ).show();
+            background_audio.play();
+            gameover_audio.pause();   
+            gameover_audio.currentTime = 0;
+            playerResponseTimeout = 3000;
+            background_audio.playbackRate = 1;
+        }
+
+        if(state == "correct") {
+            count = count + 1;
+        }
+
+        expected_val = Math.floor(Math.random() * 3);
+
+        if(expected_val == 0) {
+            $( "#action" ).text( "Push It" );
+            push_audio.play();
+        }
+
+        if(expected_val == 1) {
+            $( "#action" ).text( "Block It" );
+            block_audio.play();         
+        }
+
+        if(expected_val == 2) {
+            $( "#action" ).text( "Twist It" );
+            twist_audio.play();         
+        }
+
+        $( "#count" ).text( count );
+        
+        if (count != 0) {
+            if (Number.isInteger(count / 10) == true) {
+                background_audio.playbackRate = background_audio.playbackRate*1.2;
+                playerResponseTimeout = playerResponseTimeout*.9
+            }
+        }
+
+        myVar = setInterval(timeout1, playerResponseTimeout);
+        ajaxcheck = setTimeout(function() {ajaxCall(false);}, ajaxSpeed);
+    }
+    else if (state == "action") {
+        stopAllCommand();
+            
+        if(expected_val == val)
+            game("correct",-1,-1);
+        else
+            game("fail",-1,-1);
+    }
+    else if(state == "fail") {
+
+        clearTimeout(ajaxcheck);
+
+        $( "#menu" ).show();
+        $( "#playing" ).hide();
+
+        background_audio.pause();   
+        background_audio.currentTime = 0;    
+                
+        gameover_audio.play();
+        clearTimeout(ajaxcheck);
+    }
+
+    
+}
+</script>
+
+</head>
+<body>
+<table id = "menu" style = "margin:auto;">
+    <tr style = "width: 800px; height: 600px;">
+        <td  style = "text-align:center; font-size:20pt; padding-top:60px;">
+            Lets play BopIt&reg; on the Beaglebone (powered by Texas Instruments)
+        </td>
+    </tr>
+
+    <tr>
+        <td style = "text-align:center;">
+            <div id="start" class="button" >Start</div>
+        </td>
+    </tr>
+</table>
+
+<table id = "playing" style = "margin:auto;">
+    <tr style = "width: 800px; height: 600px;">
+        <td style = "text-align:center; width: 800px; font-size:20pt; padding-top:60px;">
+            <span id="action">PUSH IT</span>
+        </td>
+    </tr>
+    <tr>
+        <td style = "font-size:20pt">
+            Current Count: <span id="count"></span>
+        </td>
+    </tr>
+    <tr>
+        <td style = "text-align:center;">
+            <div id="push" class="button" >Push It</div>
+            <div id="block" class="button" >Block It</div>
+            <div id="twist" class="button" >Twist It</div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
