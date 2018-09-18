@@ -4,6 +4,7 @@
 import workshop
 
 # External Helper Libraries
+#import Adafruit GPIO library with alias
 import Adafruit_BBIO.GPIO as GPIO
 
 #Standard Python Library
@@ -11,16 +12,16 @@ import time
 
 
 # Set P9_46 Pinmux to GPIO
-# !!!!!!!!!!!!!!!!! ADD YOUR CODE HERE !!!!!!!!!!!!!!!!!
+## PUT YOUR CODE HERE ##
 
-# Set P9_46 to output
-# !!!!!!!!!!!!!!!!! ADD YOUR CODE HERE !!!!!!!!!!!!!!!!!
+# Call GPIO.setup and configure P9_46 as an output
+## PUT YOUR CODE HERE ##
 
 
 while True:
-    # Output HIGH to P9_46 
-    # !!!!!!!!!!!!!!!!! ADD YOUR CODE HERE !!!!!!!!!!!!!!!!!
+    # Set P9_46 HIGH as a GPIO output
+    ## PUT YOUR CODE HERE ##
     time.sleep(2)
-    # Output LOW to P9_46
-    # !!!!!!!!!!!!!!!!! ADD YOUR CODE HERE !!!!!!!!!!!!!!!!!
+    # Set P9_46 LOW as a GPIO output
+    ## PUT YOUR CODE HERE ##
     time.sleep(2)
