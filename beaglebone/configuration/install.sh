@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "tempwd" | sudo -S apt-get update
 echo "tempwd" | sudo apt-get install -y python-flask python-smbus python3-smbus python-pip
 yes | sudo pip install flask-cors
@@ -37,24 +39,3 @@ echo "tempwd" | sudo mkdir /var/www/html/workshop/
 echo "tempwd" | sudo mkdir /var/www/html/workshop/bopit
 echo "tempwd" | sudo cp -r ../workshop/bopit/webpage/* /var/www/html/workshop/bopit
 echo "tempwd" | sudo cp ../workshop/workshop.py /usr/local/lib/python2.7/dist-packages/workshop.py
-
-
-
-
-echo "tempwd" | sudo cp bb-wl18xx /etc/default/bb-wl18xx
-
-file="/etc/default/bb-wl18xx_bak"
-if [ -f "$file" ]
-then
-	echo "$file found."
-else
-	echo "$file not found."
-	echo "tempwd" | sudo cp /etc/default/bb-wl18xx /etc/default/bb-wl18xx_bak
-fi
-
-echo "tempwd" | sudo eval "sed -i -e 's/USE_PERSONAL_SSID=\"BeagleBone\"/USE_PERSONAL_SSID=\"$1\"/g' /etc/default/bb-wl18xx"
-
-echo "tempwd" | sudo eval "sed -i -e 's/USE_PERSONAL_PASSWORD=\"BeagleBone\"/USE_PERSONAL_PASSWORD=\"beaglebone_$2\"/g' /etc/default/bb-wl18xx"
-
-echo "tempwd" | sudo sed -i -e 's/USE_APPENDED_SSID=yes/USE_APPENDED_SSID=no/g' /etc/default/bb-wl18xx
-
