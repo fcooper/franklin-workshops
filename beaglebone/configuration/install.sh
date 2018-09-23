@@ -38,4 +38,4 @@ echo "tempwd" | sudo rm -rf /var/www/html/workshop > /dev/null
 echo "tempwd" | sudo mkdir /var/www/html/workshop/
 echo "tempwd" | sudo mkdir /var/www/html/workshop/bopit
 echo "tempwd" | sudo cp -r ../workshop/bopit/webpage/* /var/www/html/workshop/bopit
-echo "tempwd" | sudo cp ../workshop/workshop.py /usr/local/lib/python2.7/dist-packages/workshop.py
+echo "tempwd" | sudo cp ../workshop/helper-library/workshop.py /usr/local/lib/python2.7/dist-packages/workshop.py
