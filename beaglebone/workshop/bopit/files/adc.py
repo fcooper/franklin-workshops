@@ -5,7 +5,7 @@ import workshop
 
 # External Helper Libraries
 #import Adafruit ADC library with alias
-import Adafruit_BBIO.ADC as ADC
+import Adafruit_BBIO.ADC as ADC 
 
 #Standard Python Library
 import time
@@ -15,7 +15,7 @@ import time
 ## PUT YOUR CODE HERE ##
 
 while True:
-    # Read ADC pin (P9_36) value
+    # Read ADC pin (P9_36) and set it to variable val
     ## PUT YOUR CODE HERE ##
  
     # Output ADC value
