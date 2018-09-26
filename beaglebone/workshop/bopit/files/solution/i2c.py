@@ -65,7 +65,7 @@ bus.write_byte_data(TSL2561_I2C_ADDR, TSL2561_COMMAND_BIT | TSL2561_REGISTER_CON
 
 val = 0
 while True:
-	# Read I2C device's light intensity value.
+	# Read I2C device's light intensity value and set the value returned to "val" variable.
 	# using function to read word worth of data via smbus
 	# set function command to: (TSL2561_COMMAND_BIT | TSL2561_WORD_BIT | TSL2561_REGISTER_CHAN0_LOW)
 	# set function address to: TSL2561_I2C_ADDR

@@ -23,6 +23,8 @@ import thread
 import time
 
 
+bus = None
+
 def convertToU16(value,little_endian=True):
     value = value & 0xFFFF
     
@@ -32,16 +34,35 @@ def convertToU16(value,little_endian=True):
     
 def getTimeMS():
     return (int(round(time.time() * 1000)))
-# I2C
 
-#Configure i2c pinmux First
-# I2C Code below
-workshop.setPinMux("P9_19","i2c")  ## Solution
-workshop.setPinMux("P9_20","i2c")  ## Solution
 
-#Initialize I2C Bus 2
-# I2C Code below
-bus = smbus.SMBus(2)  ## Solution
+def gpioSetup(): 
+    # Configure pinmux for GPIO connected to push button
+    workshop.setPinMux("P9_29","gpio") ## Solution
+    # Configure gpio connected to push button as an input with a pull down
+    GPIO.setup("P9_29", GPIO.IN,pull_up_down=GPIO.PUD_DOWN)  ## Solution
+
+
+def getPushButtonVal():
+    val = -1
+
+    # Read value of push button gpio and sets its value to "val" variable
+    val =  GPIO.input("P9_29")  ## Solution
+
+    return val
+
+def adcSetup():
+    # Call ADC Setup
+    ADC.setup() ## Solution 
+
+def readPotentiometerVal():
+    val = 3000
+
+    # Read the raw adc value from pin connected to potentiometer
+    val = ADC.read_raw("P9_36") ## Solution
+
+    return val
+
 
 # I2C address options
 TSL2561_I2C_ADDR          = (0x29)    # Default address (pin left floating)
@@ -57,33 +78,40 @@ TSL2561_REGISTER_CONTROL    = 0x00
 TSL2561_DELAY_INTTIME_13MS  = (15) / 1000
 TSL2561_REGISTER_CHAN0_LOW  = 0x0C
 
-# Via I2C command tell TSL2561 to power off
-# I2C Code below
-bus.write_byte_data(TSL2561_I2C_ADDR,TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL, TSL2561_CONTROL_POWEROFF)  ## Solution
+def i2cSetup():
+    global bus
+    # I2C
 
-#Wait 1 Sec
-time.sleep(1)
+    #Configure i2c pinmux for both of the required i2c pins
+    workshop.setPinMux("P9_19","i2c")  ## Solution
+    workshop.setPinMux("P9_20","i2c")  ## Solution
 
-# Via I2C command tell TSL2561 to power off
-# I2C Code below
-bus.write_byte_data(TSL2561_I2C_ADDR, TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL, TSL2561_CONTROL_POWERON)  ## Solution
+    #Initialize I2C Bus 2 and save the object returned to the variable "bus"
+    bus = smbus.SMBus(2)  ## Solution
 
-#Wait 1 Sec
-time.sleep(1)
+    # Via I2C tell TSL2561 to power off
+    bus.write_byte_data(TSL2561_I2C_ADDR,TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL, TSL2561_CONTROL_POWEROFF)  ## Solution
 
+    #Wait 1 Sec
+    time.sleep(1)
 
+    # Via I2C command tell TSL2561 to power off
+    bus.write_byte_data(TSL2561_I2C_ADDR, TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL, TSL2561_CONTROL_POWERON)  ## Solution
 
-# Call ADC Setup (Must be done only once)
-# ADC Code below
-ADC.setup() ## Solution
+    #Wait 1 Sec
+    time.sleep(1)
 
+def getLightValue():
+    val = -1
 
-# Configure pinmux for GPIO connected to push button
-# GPIO Code below
-workshop.setPinMux("P9_29","gpio") ## Solution
-# Configure gpio connected to push button as an input with pull down
-# GPIO Code below
-GPIO.setup("P9_29", GPIO.IN,pull_up_down=GPIO.PUD_DOWN)  ## Solution
+    # Read light intensity value from TSL2561
+    val = bus.read_word_data(TSL2561_I2C_ADDR,TSL2561_COMMAND_BIT | TSL2561_WORD_BIT | TSL2561_REGISTER_CHAN0_LOW)   ## Solution
+
+    # convert the value returned to an unsigned 16 bit value
+    val = convertToU16(val)   ## Solution
+
+    # return the value read from sensor
+    return val
 
 
 checked = True
@@ -113,28 +141,28 @@ def triggerPush():
 
     # Read value of push button gpio
     # GPIO Code below
-    btn_val =  GPIO.input("P9_29")  ## Solution
+    btn_val =  getPushButtonVal()
     
     # Transition from state 0 to state 1 and set rtn_val= True
     # if the variable for state is equal to 0 and button has been pressed     
     # GPIO Code below
-    if debounce_state == 0 and btn_val == 1:  ## Solution
-        debounce_state = 1  ## Solution
+    if debounce_state == 0 and btn_val == 1:
+        debounce_state = 1
         return True
    
     # Transition from state 1 to state 2 and set last_read_gpio to current_time
     # if the variable for state is equal to 1 and button has been released  
     # GPIO Code below
-    elif debounce_state == 1 and btn_val == 0:   ## Solution
-        debounce_state = 2   ## Solution
-        last_read_gpio = current_time   ## Solution
+    elif debounce_state == 1 and btn_val == 0:
+        debounce_state = 2
+        last_read_gpio = current_time
         return False
         
     # Transition from state 2 to state 0
     # if the variable for state is equal to 2 and time_delta is greater than gpio_debounce
     # GPIO Code below
-    elif debounce_state == 2 and  (time_delta) > gpio_debounce:   ## Solution
-        debounce_state = 0   ## Solution
+    elif debounce_state == 2 and  (time_delta) > gpio_debounce:
+        debounce_state = 0
         return False
         
     return False
@@ -156,10 +184,13 @@ adc_debounce = 500
 
 def setADCBaseLine():
     global adc_last_val
-
+    val = None
     # Read raw ADC value for pin connected to potentiometer
     # ADC Code below
-    adc_last_val = ADC.read_raw("P9_36") ## Solution
+    val = readPotentiometerVal() ## Solution
+
+    if val is not 3000:
+        adc_last_val = val
     
 def triggerTwist():
     global adc_last_val
@@ -178,10 +209,10 @@ def triggerTwist():
     if adc_cur_state == 0:
         # Read voltage from potentiometer
         # ADC Code below
-        cur_val = ADC.read_raw("P9_36") ## Solution
+        cur_val = readPotentiometerVal() ## Solution
         val_delta = abs(adc_last_val-cur_val)
         
-        if abs(val_delta) > adc_threshold:
+        if cur_val is not 3000 and abs(val_delta) > adc_threshold:
             adc_cur_state = 1
             last_read_adc = getTimeMS()
             rtn_val = True
@@ -211,16 +242,14 @@ def triggerBlock():
     
     # Don't read sensor again unless TSL2561_DELAY_INTTIME_13MS has passed
     if (time_delta) > TSL2561_DELAY_INTTIME_13MS:
-        # Read light intensity value from TSL2561
-        # I2C Code below
-        val = bus.read_word_data(TSL2561_I2C_ADDR,TSL2561_COMMAND_BIT | TSL2561_WORD_BIT | TSL2561_REGISTER_CHAN0_LOW)   ## Solution
-        val = convertToU16(val)   ## Solution
+
+        val = getLightValue()
         
-        if sensor_state == 0 and val < blocked_threshold:
+        if val is not -1 and sensor_state == 0 and val < blocked_threshold:
             rtn_val = True
             sensor_state = 1
 
-        elif sensor_state == 1 and val >= unblocked_threshold:
+        elif val is not -1 and sensor_state == 1 and val >= unblocked_threshold:
             sensor_state = 0
                     
     return rtn_val  
@@ -259,6 +288,7 @@ except:
      print "Error: unable to start thread"
 
 
+i2cSetup()
 
 # Define a function for the thread
 app = Flask(__name__)

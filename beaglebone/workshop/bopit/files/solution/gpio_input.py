@@ -4,7 +4,7 @@
 import workshop
 
 # External Helper Libraries
-#import Adafruit GPIO library with alias
+#import Adafruit GPIO library with alias GPIO
 import Adafruit_BBIO.GPIO as GPIO ## Solution
 
 #Standard Python Library

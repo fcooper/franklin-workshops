@@ -15,7 +15,7 @@ import time
 ADC.setup() ## Solution
 
 while True:
-    # Read ADC pin (P9_36) value
+    # Read ADC pin (P9_36) and set it to variable val
     val = ADC.read("P9_36") ## Solution
  
     # Output ADC value
