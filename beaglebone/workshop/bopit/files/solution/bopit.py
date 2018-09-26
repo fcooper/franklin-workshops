@@ -6,15 +6,15 @@ import workshop
 # External Helper Libraries
 # import required gpio library with alias
 # GPIO Code below
-import Adafruit_BBIO.GPIO as GPIO ## Solution
+import Adafruit_BBIO.GPIO as GPIO
 # import required adc library with alias
 # ADC Code below
-import Adafruit_BBIO.ADC as ADC  ## Solution
+import Adafruit_BBIO.ADC as ADC
 from flask import Flask
 from flask_cors import CORS
 # import required i2c/smbus library
 # I2C Code below
-import smbus  ## Solution
+import smbus
 
 #Standard Python Library
 import math
@@ -37,6 +37,9 @@ def getTimeMS():
 
 
 def gpioSetup(): 
+    # dummy place holder
+    x = 0
+
     # Configure pinmux for GPIO connected to push button
     workshop.setPinMux("P9_29","gpio") ## Solution
     # Configure gpio connected to push button as an input with a pull down
@@ -52,6 +55,9 @@ def getPushButtonVal():
     return val
 
 def adcSetup():
+    # dummy place holder
+    x = 0
+
     # Call ADC Setup
     ADC.setup() ## Solution 
 
@@ -184,8 +190,9 @@ adc_debounce = 500
 
 def setADCBaseLine():
     global adc_last_val
-    val = None
-    # Read raw ADC value for pin connected to potentiometer
+    val = 3000
+    # Read raw ADC value for pin connected to potentiometer and 
+    # set the value to "val" variable
     # ADC Code below
     val = readPotentiometerVal() ## Solution
 
@@ -280,6 +287,11 @@ def processActions( threadName):
                 print response
 
 
+i2cSetup()
+gpioSetup()
+adcSetup()
+
+
 # Create two threads as follows
 try:
      thread.start_new_thread( processActions, ("Thread-1",  ) )
@@ -288,7 +300,6 @@ except:
      print "Error: unable to start thread"
 
 
-i2cSetup()
 
 # Define a function for the thread
 app = Flask(__name__)
