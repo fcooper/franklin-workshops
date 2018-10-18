@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import workshop
-## PUT YOUR CODE HERE ##
+import smbus  ## Solution
 import time
 
 import Adafruit_BBIO.ADC as ADC 
@@ -27,7 +27,7 @@ GPIO.setup("P9_29", GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
 ADC.setup()
 
 
-## PUT YOUR CODE HERE ##
+bus = smbus.SMBus(2) ## Solution
 
 
 TSL2561_I2C_ADDR          = (0x29)    # Default address (pin left floating)
@@ -43,12 +43,12 @@ TSL2561_REGISTER_CONTROL    = 0x00
 TSL2561_DELAY_INTTIME_13MS  = (15) / 1000
 TSL2561_REGISTER_CHAN0_LOW  = 0x0C
 
-## PUT YOUR CODE HERE ##
+bus.write_byte_data(TSL2561_I2C_ADDR,TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL, TSL2561_CONTROL_POWEROFF) ## Solution
 
 
 time.sleep(1)
 
-## PUT YOUR CODE HERE ##
+bus.write_byte_data(TSL2561_I2C_ADDR, TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL, TSL2561_CONTROL_POWERON) ## Solution
 
 
 count = 0
@@ -60,7 +60,7 @@ print "This will run for 6 seconds"
 light = -1
 status = False
 while count < 12:
-	## PUT YOUR CODE HERE ##
+	val = bus.read_word_data(TSL2561_I2C_ADDR,TSL2561_COMMAND_BIT | TSL2561_WORD_BIT | TSL2561_REGISTER_CHAN0_LOW) ## Solution
 	val = convertToU16(val)
 	
 	if light is -1 and val != 0:
