@@ -15,16 +15,18 @@ import time
 ## PUT YOUR CODE HERE ##
 
 while True:
-    # Read ADC pin (P9_36) and set it to variable val
+    # Read ADC value from pin (P9_36) and set retrieved value to variable called "val"
     ## PUT YOUR CODE HERE ##
  
-    # Output ADC value
+    # Print value of "val" variable
     ## PUT YOUR CODE HERE ##
 
-    # Convert ADC digital value to analog (voltage) value. Max analog value is 1.8V
+    # Convert digital value stored in "val" variable to analog (voltage) value.
+    # Store the converted value back into "val" variable.
+    # Important note: Max analog value possible is 1.8V
     ## PUT YOUR CODE HERE ##
 
-    # Output analog (voltage) value
+    # Print value of "val" variable (should contain analog value from (0 - 1.8V)
     ## PUT YOUR CODE HERE ##
 
     time.sleep(1)

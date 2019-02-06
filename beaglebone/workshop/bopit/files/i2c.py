@@ -20,12 +20,12 @@ def convertToU16(value,little_endian=True):
 	
 # I2C
 
-#Configure Pinmux First
+# Configure Pinmux First
 # Set both P9_19 and P9_20 pin's pinmux to i2c mode
 ## PUT YOUR CODE HERE ##
 ## PUT YOUR CODE HERE ##
 
-#Initialize I2C/smbus to the correct i2c instance
+#Initialize I2C/smbus to the 2nd i2c instance. Set the value returned by the function to the "bus" variable
 ## PUT YOUR CODE HERE ##
 
 
@@ -43,11 +43,14 @@ TSL2561_REGISTER_CONTROL    = 0x00
 TSL2561_DELAY_INTTIME_13MS  = (15) / 1000
 TSL2561_REGISTER_CHAN0_LOW  = 0x0C
 
-# Power Device Off (Set back to default configuration)
-# using function to write byte of data via smbus
-# set function command to: (TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL)
-# set function value to: TSL2561_CONTROL_POWEROFF
-# set function address to: TSL2561_I2C_ADDR
+# Power Device Off
+# using a function to write a byte of data via smbus
+# set address parameter  to: TSL2561_I2C_ADDR
+# set command parameter  to: (TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL)
+# set function parameter to: TSL2561_CONTROL_POWEROFF
+# Use the below syntax. Replace what is in the <> with the proper text
+# syntax:
+# bus.<function>(<i2c address>, <command param>, <function param>)
 ## PUT YOUR CODE HERE ##
 
 
@@ -55,27 +58,34 @@ TSL2561_REGISTER_CHAN0_LOW  = 0x0C
 time.sleep(1)
 
 # Power Device ON
-# using function to write byte of data via smbus
-# set function command to: (TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL)
-# set function value to: TSL2561_CONTROL_POWERON
-# set function address to: TSL2561_I2C_ADDR
+# use a function to write a byte of data via smbus
+# set address parameter  to: TSL2561_I2C_ADDR
+# set command parameter  to: (TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL)
+# set function parameter to: TSL2561_CONTROL_POWERON
+# Use the below syntax. Replace what is in the <> with the proper text
+# syntax:
+# bus.<function>(<i2c address>, <command param>, <function param>)
 ## PUT YOUR CODE HERE ##
 
 
 
 val = 0
 while True:
+
 	# Read I2C device's light intensity value and set the value returned to "val" variable.
-	# using function to read word worth of data via smbus
-	# set function command to: (TSL2561_COMMAND_BIT | TSL2561_WORD_BIT | TSL2561_REGISTER_CHAN0_LOW)
-	# set function address to: TSL2561_I2C_ADDR
+	# use a function to read a word of data via smbus
+	# set address parameter  to: TSL2561_I2C_ADDR
+	# set command parameter  to: (TSL2561_COMMAND_BIT | TSL2561_WORD_BIT | TSL2561_REGISTER_CHAN0_LOW)
+	# Use the below syntax. Replace what is in the <> with the proper text
+	# syntax:
+	# bus.<function>(<i2c address>, <command param>, <function param>)
 	## PUT YOUR CODE HERE ##
 
 
-	#Convert value you read to unsigned 16
+	# Convert "val" variable to unsigned 16
 	val = convertToU16(val)
 
-	#Sleep for TSL2561_DELAY_INTTIME_13MS
+	# Sleep for "TSL2561_DELAY_INTTIME_13MS"
 	## PUT YOUR CODE HERE ##
 
 

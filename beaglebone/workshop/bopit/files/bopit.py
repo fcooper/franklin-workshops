@@ -22,6 +22,19 @@ import random
 import thread
 import time
 
+# I2C address options
+TSL2561_I2C_ADDR          = (0x29)    # Default address (pin left floating)
+
+TSL2561_COMMAND_BIT         = (0x80)    # Must be 1
+TSL2561_WORD_BIT            = (0x20)    # 1 = read/write word (rather than byte)
+
+TSL2561_CONTROL_POWERON     = (0x03)
+TSL2561_CONTROL_POWEROFF    = (0x00)
+
+TSL2561_REGISTER_CONTROL    = 0x00
+
+TSL2561_DELAY_INTTIME_13MS  = (15) / 1000
+TSL2561_REGISTER_CHAN0_LOW  = 0x0C
 
 bus = None
 
@@ -40,16 +53,16 @@ def gpioSetup():
     # dummy place holder
     x = 0
 
-    # Configure pinmux for GPIO connected to push button
+    # Set the pin P9_29 pinmux to gpio mode
     ## PUT YOUR CODE HERE ##
-    # Configure gpio connected to push button as an input with a pull down
+    # Configure pin P9_29 as an input and enable pull down
     ## PUT YOUR CODE HERE ##
 
 
 def getPushButtonVal():
     val = -1
 
-    # Read value of push button gpio and sets its value to "val" variable
+    # Read value of pin P9_29 and save its value to "val" variable
     ## PUT YOUR CODE HERE ##
 
     return val
@@ -58,50 +71,50 @@ def adcSetup():
     # dummy place holder
     x = 0
 
-    # Call ADC Setup
+    # Call ADC setup function
     ## PUT YOUR CODE HERE ##
 
 def readPotentiometerVal():
     val = 3000
 
-    # Read the raw adc value from pin connected to potentiometer
+    # Read raw adc value from P9_36 and save its value to "val" variable
     ## PUT YOUR CODE HERE ##
 
     return val
-
-
-# I2C address options
-TSL2561_I2C_ADDR          = (0x29)    # Default address (pin left floating)
-
-TSL2561_COMMAND_BIT         = (0x80)    # Must be 1
-TSL2561_WORD_BIT            = (0x20)    # 1 = read/write word (rather than byte)
-
-TSL2561_CONTROL_POWERON     = (0x03)
-TSL2561_CONTROL_POWEROFF    = (0x00)
-
-TSL2561_REGISTER_CONTROL    = 0x00
-
-TSL2561_DELAY_INTTIME_13MS  = (15) / 1000
-TSL2561_REGISTER_CHAN0_LOW  = 0x0C
 
 def i2cSetup():
     global bus
     # I2C
 
-    #Configure i2c pinmux for both of the required i2c pins
+    # Set the pin P9_19 pinmux to i2c mode
     ## PUT YOUR CODE HERE ##
-    ## PUT YOUR CODE HERE ##
-
-    #Initialize I2C Bus 2 and save the object returned to the variable "bus"
+    # Set the pin P9_20 pinmux to i2c mode
     ## PUT YOUR CODE HERE ##
 
-    # Via I2C tell TSL2561 to power off
+    # Initialize I2C Bus to instance #2 and save the object returned to the variable "bus"
+    ## PUT YOUR CODE HERE ##
+
+    # Power Device Off
+    # using a function to write a byte of data via smbus
+    # set address parameter  to: TSL2561_I2C_ADDR
+    # set command parameter  to: (TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL)
+    # set function parameter to: TSL2561_CONTROL_POWEROFF
+    # Use the below syntax. Replace what is in the <> with the proper text
+    # syntax:
+    # bus.<function>(<i2c address>, <command param>, <function param>)
     ## PUT YOUR CODE HERE ##
 
     #Wait 1 Sec
     time.sleep(1)
 
-    # Via I2C command tell TSL2561 to power off
+    # Power Device ON
+    # use a function to write a byte of data via smbus
+    # set address parameter  to: TSL2561_I2C_ADDR
+    # set command parameter  to: (TSL2561_COMMAND_BIT | TSL2561_REGISTER_CONTROL)
+    # set function parameter to: TSL2561_CONTROL_POWERON
+    # Use the below syntax. Replace what is in the <> with the proper text
+    # syntax:
+    # bus.<function>(<i2c address>, <command param>, <function param>)
     ## PUT YOUR CODE HERE ##
 
     #Wait 1 Sec
@@ -110,7 +123,13 @@ def i2cSetup():
 def getLightValue():
     val = -1
 
-    # Read light intensity value from TSL2561
+    # Read I2C device's light intensity value and set the value returned to "val" variable.
+    # use a function to read a word of data via smbus
+    # set address parameter  to: TSL2561_I2C_ADDR
+    # set command parameter  to: (TSL2561_COMMAND_BIT | TSL2561_WORD_BIT | TSL2561_REGISTER_CHAN0_LOW)
+    # Use the below syntax. Replace what is in the <> with the proper text
+    # syntax:
+    # bus.<function>(<i2c address>, <command param>, <function param>)
     ## PUT YOUR CODE HERE ##
 
     # convert the value returned to an unsigned 16 bit value
@@ -194,7 +213,7 @@ def setADCBaseLine():
     # Read raw ADC value for pin connected to potentiometer and 
     # set the value to "val" variable
     # ADC Code below
-    ## PUT YOUR CODE HERE ##
+    val = readPotentiometerVal()
 
     if val is not 3000:
         adc_last_val = val
@@ -216,7 +235,7 @@ def triggerTwist():
     if adc_cur_state == 0:
         # Read voltage from potentiometer
         # ADC Code below
-        ## PUT YOUR CODE HERE ##
+        cur_val = readPotentiometerVal()
         val_delta = abs(adc_last_val-cur_val)
         
         if cur_val is not 3000 and abs(val_delta) > adc_threshold:
@@ -268,7 +287,6 @@ def processActions( threadName):
 
      while True:
         new_val = "Nothing"
-
         if checked is True:
             setADCBaseLine()
             checked = False
